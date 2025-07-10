@@ -25,7 +25,7 @@ exports.createTodo = async (req, res) => {
 
 exports.getPublicTodos = async (req, res) => {
   try {
-    const publicTodos=await Todo.find({visibility: "public"}).populate("user", "username");
+    const publicTodos=await Todo.find({visibility: "public"}).populate("mentions", "username");
     res.status(200).json(publicTodos);
   } catch (error) {
     res.status(500).json({ error: error.message }); 
