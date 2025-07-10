@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 
 exports.createTodo = async (req, res) => {
   try {
-    const { title, description, tags, priority, mentions } = req.body;
+    const { title, description, tags, priority, mentions , visibility } = req.body;
     const mentionIds = await User.find({ username: { $in: mentions } }).select("_id");
 
     const todo = await Todo.create({
@@ -12,7 +12,8 @@ exports.createTodo = async (req, res) => {
       tags,
       priority,
       mentions: mentionIds,
-      user: req.user.id
+      user: req.user.id,
+      visibility: visibility || "private"
     });
 
     res.status(201).json(todo);
@@ -20,6 +21,17 @@ exports.createTodo = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getPublicTodos = async (req, res) => {
+  try {
+    const publicTodos=await Todo.find({visibility: "public"}).populate("user", "username");
+    res.status(200).json(publicTodos);
+  } catch (error) {
+    res.status(500).json({ error: error.message }); 
+  }
+}
+
 
 exports.getTodos = async (req, res) => {
   const { page = 1, limit = 10, priority, tag, mention, sortBy = "createdAt" } = req.query;
